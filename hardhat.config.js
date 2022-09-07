@@ -80,8 +80,12 @@ module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      forking: {
-        url: process.env.BSC_URL || "",
+      accounts: {
+        mnemonic: "test test test test test test test test test test test junk",
+        path: "m/44'/60'/0'/0",
+        initialIndex: 0,
+        count: 20,
+        passphrase: "",
       },
     },
     ropsten: {
