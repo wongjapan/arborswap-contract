@@ -33,7 +33,7 @@ contract ReflectionsDistributor is Ownable {
 
   /// @dev Internal balance of STAKE_TOKEN, this gets updated on user deposits / withdrawals
   /// this allows to reward users with STAKE_TOKEN
-  uint256 public internalEmpireBalance;
+  uint256 public internalArborBalance;
 
   /// @notice Last reward balance
   uint256 public lastRewardBalance;
@@ -87,7 +87,7 @@ contract ReflectionsDistributor is Ownable {
       }
     }
 
-    internalEmpireBalance += _amount;
+    internalArborBalance += _amount;
     emit Deposit(_user, _amount);
   }
 
@@ -110,7 +110,7 @@ contract ReflectionsDistributor is Ownable {
       emit ClaimReward(_user, _pending);
     }
 
-    internalEmpireBalance -= _amount;
+    internalArborBalance -= _amount;
 
     emit Withdraw(_user, _amount);
   }
@@ -120,16 +120,16 @@ contract ReflectionsDistributor is Ownable {
    * @dev Needs to be called before any deposit or withdrawal
    */
   function updateReward() internal {
-    uint256 _totalEmpire = internalEmpireBalance;
+    uint256 _totalArbor = internalArborBalance;
 
     uint256 _currRewardBalance = stakeToken.balanceOf(address(this));
     uint256 _rewardBalance = _currRewardBalance;
 
     // Did ReflectionsDistributor receive any token
-    if (_rewardBalance >= lastRewardBalance + minAmountReflection && _totalEmpire > 0) {
+    if (_rewardBalance >= lastRewardBalance + minAmountReflection && _totalArbor > 0) {
       uint256 _accruedReward = _rewardBalance - lastRewardBalance;
 
-      accRewardPerShare = accRewardPerShare + (_accruedReward * ACC_REWARD_PER_SHARE_PRECISION) / _totalEmpire;
+      accRewardPerShare = accRewardPerShare + (_accruedReward * ACC_REWARD_PER_SHARE_PRECISION) / _totalArbor;
       lastRewardBalance = _rewardBalance;
     }
   }
@@ -181,18 +181,18 @@ contract ReflectionsDistributor is Ownable {
    */
   function pendingReward(address _user) external view returns (uint256) {
     UserInfo storage user = userInfo[_user];
-    uint256 _totalEmpire = internalEmpireBalance;
+    uint256 _totalArbor = internalArborBalance;
     uint256 _accRewardTokenPerShare = accRewardPerShare;
 
     uint256 _currRewardBalance = stakeToken.balanceOf(address(this));
     uint256 _rewardBalance = _currRewardBalance;
 
-    if (_rewardBalance >= lastRewardBalance + minAmountReflection && _totalEmpire > 0) {
+    if (_rewardBalance >= lastRewardBalance + minAmountReflection && _totalArbor > 0) {
       uint256 _accruedReward = _rewardBalance - lastRewardBalance;
       _accRewardTokenPerShare =
         _accRewardTokenPerShare +
         (_accruedReward * ACC_REWARD_PER_SHARE_PRECISION) /
-        _totalEmpire;
+        _totalArbor;
     }
     return (user.amount * _accRewardTokenPerShare) / ACC_REWARD_PER_SHARE_PRECISION - user.rewardDebt;
   }
