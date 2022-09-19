@@ -1,5 +1,6 @@
-const { ethers } = require("hardhat");
-const { FEE_TO_SETTER } = require("./constants/address");
+const hre = require("hardhat");
+const {ethers} = require("hardhat");
+const {FEE_TO_SETTER} = require("./constants/address");
 
 async function main() {
   const ArborSwapFactory = await ethers.getContractFactory("ArborSwapFactory");
@@ -11,6 +12,16 @@ async function main() {
 
   const pairCodeHash = await arborSwapFactory.pairCodeHash();
   console.log("pairCodeHash:", pairCodeHash);
+
+  try {
+    await hre.run("verify", {
+      address: arborSwapFactory.address,
+      constructorArgsParams: [FEE_TO_SETTER],
+    });
+  } catch (error) {
+    console.error(error);
+    console.log(`Smart contract at address ${arborSwapFactory.address} is already verified`);
+  }
 }
 
 main().catch((error) => {

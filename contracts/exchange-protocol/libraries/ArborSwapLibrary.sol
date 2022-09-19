@@ -30,7 +30,7 @@ library ArborSwapLibrary {
             hex'ff',
             factory,
             keccak256(abi.encodePacked(token0, token1)),
-            hex'659ed6adb199b89b916fbc7775cf47b5104dbe8d243cc344455c329b5635a492' // init code hash
+            hex'2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b' // init code hash
           )
         )
       )

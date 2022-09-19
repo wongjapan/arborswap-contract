@@ -2,8 +2,8 @@
   "extends": "solhint:recommended",
   "rules": {
     "compiler-version": ["warn", "^0.8.0"],
-    "func-visibility": ["warn", { "ignoreConstructors": true }],
-    "quotes": ["error", "single"],
+    "func-visibility": ["warn", {"ignoreConstructors": true}],
+    "quotes": ["warn", "double"],
     "max-line-length": ["error", 120],
     "indent": ["warn", 2]
   }

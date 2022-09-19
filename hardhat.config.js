@@ -5,6 +5,8 @@ require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
+const { forkNetwork } = require("./config");
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -77,19 +79,15 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: "bscTestnet",
   networks: {
     hardhat: {
-      accounts: {
-        mnemonic: "test test test test test test test test test test test junk",
-        path: "m/44'/60'/0'/0",
-        initialIndex: 0,
-        count: 20,
-        passphrase: "",
+      forking: {
+        url: forkNetwork.rba || "",
       },
     },
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
+    rba: {
+      url: forkNetwork.rba || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     eth: {
@@ -97,11 +95,15 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     bscTestnet: {
-      url: process.env.BSCTESTNET_URL || "",
+      url: forkNetwork.bsc_testnet || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     bsc: {
       url: process.env.BSC_URL || "",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    mumbai: {
+      url: forkNetwork.mumbai || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
@@ -119,6 +121,7 @@ module.exports = {
       // binance smart chain
       bsc: process.env.BSCSCAN_API_KEY,
       bscTestnet: process.env.BSCSCAN_API_KEY,
+      polygonMumbai: process.env.MUMBAI_API_KEY,
     },
   },
 };
