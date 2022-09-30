@@ -105,8 +105,8 @@ contract ArborsFarmingWithFixedLockTime is Ownable, Pausable {
     return newRewards + staker[_staker].stakeRewards;
   }
 
-  function setTreasury(address _tresuary) external onlyOwner {
-    TREASURY = _tresuary;
+  function setTreasury(address _treasury) external onlyOwner {
+    TREASURY = _treasury;
     emit LogSetTreasury(TREASURY);
   }
 
