@@ -21,27 +21,20 @@ contract ArborsStaking is Ownable, Pausable {
   IERC20 public immutable stakeToken;
   IERC20 public immutable rewardsToken;
 
-  address public TREASURY;
-  address public REWARD_WALLET;
-
   event LogStake(address indexed from, uint256 amount);
   event LogUnstake(address indexed from, uint256 amount, uint256 amountRewards);
   event LogRewardsWithdrawal(address indexed to, uint256 amount);
-  event LogSetTreasury(address indexed newTreasury);
-  event LogSetRewardWallet(address indexed newRewardWallet);
+
+  event LogTokenRecovery(address tokenRecovered, uint256 amount);
 
   constructor(
     IERC20 _stakeToken,
     IERC20 _rewardsToken,
-    address _treasury,
-    address _rewardWallet,
     uint256 _rewardPerBlockTokenN,
     uint256 _rewardPerBlockTokenD
   ) {
     stakeToken = _stakeToken;
     rewardsToken = _rewardsToken;
-    TREASURY = _treasury;
-    REWARD_WALLET = _rewardWallet;
     rewardPerBlockTokenN = _rewardPerBlockTokenN;
     rewardPerBlockTokenD = _rewardPerBlockTokenD;
   }
@@ -55,7 +48,7 @@ contract ArborsStaking is Ownable, Pausable {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
     }
 
-    require(stakeToken.transferFrom(msg.sender, TREASURY, _amount), "TransferFrom fail");
+    require(stakeToken.transferFrom(msg.sender, address(this), _amount), "TransferFrom fail");
 
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startBlock = block.number;
@@ -71,7 +64,7 @@ contract ArborsStaking is Ownable, Pausable {
     staker[msg.sender].startBlock = block.number;
     staker[msg.sender].stakeRewards = 0;
 
-    require(stakeToken.transferFrom(TREASURY, msg.sender, _amount), "TransferFrom fail");
+    require(stakeToken.transfer(msg.sender, _amount), "TransferFrom fail");
 
     emit LogUnstake(msg.sender, _amount, amountWithdraw);
   }
@@ -79,7 +72,7 @@ contract ArborsStaking is Ownable, Pausable {
   function _withdrawRewards() internal returns (uint256) {
     uint256 amountWithdraw = getTotalRewards(msg.sender);
     if (amountWithdraw > 0) {
-      require(rewardsToken.transferFrom(REWARD_WALLET, msg.sender, amountWithdraw), "TransferFrom fail");
+      require(rewardsToken.transfer(msg.sender, amountWithdraw), "TransferFrom fail");
     }
     return amountWithdraw;
   }
@@ -99,18 +92,17 @@ contract ArborsStaking is Ownable, Pausable {
     return newRewards + staker[_staker].stakeRewards;
   }
 
-  function setTreasury(address _tresuary) external onlyOwner {
-    TREASURY = _tresuary;
-    emit LogSetTreasury(TREASURY);
-  }
-
-  function setRewardWallet(address _rewardWallet) external onlyOwner {
-    REWARD_WALLET = _rewardWallet;
-    emit LogSetRewardWallet(REWARD_WALLET);
-  }
-
   function setPause() external onlyOwner {
     _pause();
+  }
+
+  function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
+    require(_tokenAddress != address(stakeToken), "Cannot be staked token");
+    require(_tokenAddress != address(rewardsToken), "Cannot be reward token");
+
+    IERC20(_tokenAddress).transfer(address(msg.sender), _tokenAmount);
+
+    emit LogTokenRecovery(_tokenAddress, _tokenAmount);
   }
 
   function setUnpause() external onlyOwner {

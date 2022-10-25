@@ -12,8 +12,6 @@ async function main() {
   const arborsStakingWithFixedLockTime = await ArborsStakingWithFixedLockTime.deploy(
     stakeToken,
     rewardToken,
-    TREASURY,
-    REWARD_WALLET,
     rewardN,
     rewardD
   );
@@ -25,7 +23,7 @@ async function main() {
   try {
     await hre.run("verify", {
       address: arborsStakingWithFixedLockTime.address,
-      constructorArgsParams: [stakeToken, rewardToken, TREASURY, REWARD_WALLET, rewardN, rewardD],
+      constructorArgsParams: [stakeToken, rewardToken, rewardN, rewardD],
     });
   } catch (error) {
     console.error(error);

@@ -4,7 +4,6 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./interfaces/IStakingTreasury.sol";
 
 contract ArborsStakingWithFixedLockTimeAndReflection is Ownable, Pausable {
   struct StakerInfo {
@@ -25,28 +24,19 @@ contract ArborsStakingWithFixedLockTimeAndReflection is Ownable, Pausable {
 
   uint256 public lockTime = 30 days;
 
-  address public TREASURY;
-  address public REWARD_WALLET;
-
   event LogStake(address indexed from, uint256 amount);
   event LogUnstake(address indexed from, uint256 amount, uint256 amountRewards);
   event LogRewardsWithdrawal(address indexed to, uint256 amount);
-  event LogSetTreasury(address indexed newTreasury);
-  event LogSetRewardWallet(address indexed newRewardWallet);
   event LogSetLockTime(uint256 lockTime);
 
   constructor(
     IERC20 _stakeToken,
     IERC20 _rewardsToken,
-    address _treasury,
-    address _rewardWallet,
     uint256 _rewardPerBlockTokenN,
     uint256 _rewardPerBlockTokenD
   ) {
     stakeToken = _stakeToken;
     rewardsToken = _rewardsToken;
-    TREASURY = _treasury;
-    REWARD_WALLET = _rewardWallet;
     rewardPerBlockTokenN = _rewardPerBlockTokenN;
     rewardPerBlockTokenD = _rewardPerBlockTokenD;
   }
@@ -60,7 +50,7 @@ contract ArborsStakingWithFixedLockTimeAndReflection is Ownable, Pausable {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
     }
 
-    IStakingTreasury(TREASURY).deposit(msg.sender, _amount);
+    require(stakeToken.transferFrom(msg.sender, address(this), _amount), "TransferFrom fail");
 
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startBlock = block.number;
@@ -78,15 +68,14 @@ contract ArborsStakingWithFixedLockTimeAndReflection is Ownable, Pausable {
     staker[msg.sender].startBlock = block.number;
     staker[msg.sender].stakeRewards = 0;
 
-    IStakingTreasury(TREASURY).withdraw(msg.sender, _amount);
-
+    require(stakeToken.transfer(msg.sender, _amount), "TransferFrom fail");
     emit LogUnstake(msg.sender, _amount, amountWithdraw);
   }
 
   function _withdrawRewards() internal returns (uint256) {
     uint256 amountWithdraw = getTotalRewards(msg.sender);
     if (amountWithdraw > 0) {
-      require(rewardsToken.transferFrom(REWARD_WALLET, msg.sender, amountWithdraw), "TransferFrom fail");
+      require(stakeToken.transfer(msg.sender, amountWithdraw), "TransferFrom fail");
     }
     return amountWithdraw;
   }
@@ -104,16 +93,6 @@ contract ArborsStakingWithFixedLockTimeAndReflection is Ownable, Pausable {
     uint256 newRewards = ((block.number - staker[_staker].startBlock) * staker[_staker].amount * rewardPerBlockTokenN) /
       rewardPerBlockTokenD;
     return newRewards + staker[_staker].stakeRewards;
-  }
-
-  function setTreasury(address _tresuary) external onlyOwner {
-    TREASURY = _tresuary;
-    emit LogSetTreasury(TREASURY);
-  }
-
-  function setRewardWallet(address _rewardWallet) external onlyOwner {
-    REWARD_WALLET = _rewardWallet;
-    emit LogSetRewardWallet(REWARD_WALLET);
   }
 
   function setLockTime(uint256 _lockTime) external onlyOwner {
