@@ -1,14 +1,13 @@
 const hre = require("hardhat");
 const {ethers} = require("hardhat");
 
-const stakeToken = "0x8655e717fA4157e1099F61bA261c2Cd7b121d661";
-const rewardToken = "0x8655e717fA4157e1099F61bA261c2Cd7b121d661";
-const rewardN = "100";
-const rewardD = "1000000";
+const stakeToken = "0x083295D160A243D0A850Bc75E317e1c56f935EA9";
+const rewardToken = "0x083295D160A243D0A850Bc75E317e1c56f935EA9";
+const rate = "5";
 
 async function main() {
   const ArborsStaking = await ethers.getContractFactory("ArborsStaking");
-  const arborsStaking = await ArborsStaking.deploy(stakeToken, rewardToken, rewardN, rewardD);
+  const arborsStaking = await ArborsStaking.deploy(stakeToken, rewardToken, rate);
 
   await arborsStaking.deployed();
 
@@ -17,7 +16,7 @@ async function main() {
   try {
     await hre.run("verify", {
       address: arborsStaking.address,
-      constructorArgsParams: [stakeToken, rewardToken, rewardN, rewardD],
+      constructorArgsParams: [stakeToken, rewardToken, rate],
     });
   } catch (error) {
     console.error(error);

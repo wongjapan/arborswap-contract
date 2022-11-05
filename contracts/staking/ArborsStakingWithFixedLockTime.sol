@@ -9,37 +9,37 @@ contract ArborsStakingWithFixedLockTime is Ownable, Pausable {
   struct StakerInfo {
     uint256 amount;
     uint256 endTime;
-    uint256 startBlock;
+    uint256 startTime;
     uint256 stakeRewards;
   }
 
   // Staker Info
   mapping(address => StakerInfo) public staker;
-
-  uint256 public immutable rewardPerBlockTokenN;
-  uint256 public immutable rewardPerBlockTokenD; // Must be greater than zero
+  uint256 public constant YEAR_SECOND = 31577600;
 
   IERC20 public immutable stakeToken;
   IERC20 public immutable rewardsToken;
 
-  uint256 public lockTime = 30 days;
+  uint256 public lockTime;
+  uint256 public rate;
 
   event LogStake(address indexed from, uint256 amount);
   event LogUnstake(address indexed from, uint256 amount, uint256 amountRewards);
   event LogRewardsWithdrawal(address indexed to, uint256 amount);
   event LogSetLockTime(uint256 lockTime);
+  event LogSetRate(uint256 rate);
   event LogTokenRecovery(address tokenRecovered, uint256 amount);
 
   constructor(
     IERC20 _stakeToken,
     IERC20 _rewardsToken,
-    uint256 _rewardPerBlockTokenN,
-    uint256 _rewardPerBlockTokenD
+    uint256 _lockTime,
+    uint256 _rate
   ) {
     stakeToken = _stakeToken;
     rewardsToken = _rewardsToken;
-    rewardPerBlockTokenN = _rewardPerBlockTokenN;
-    rewardPerBlockTokenD = _rewardPerBlockTokenD;
+    lockTime = _lockTime;
+    rate = _rate;
   }
 
   function stake(uint256 _amount) external whenNotPaused {
@@ -54,8 +54,8 @@ contract ArborsStakingWithFixedLockTime is Ownable, Pausable {
     require(stakeToken.transferFrom(msg.sender, address(this), _amount), "TransferFrom fail");
 
     staker[msg.sender].amount += _amount;
-    staker[msg.sender].startBlock = block.number;
-    staker[msg.sender].endTime = block.timestamp + lockTime;
+    staker[msg.sender].startTime = block.timestamp;
+    staker[msg.sender].endTime = block.timestamp + (lockTime * 1 days);
     emit LogStake(msg.sender, _amount);
   }
 
@@ -66,7 +66,7 @@ contract ArborsStakingWithFixedLockTime is Ownable, Pausable {
 
     uint256 amountWithdraw = _withdrawRewards();
     staker[msg.sender].amount -= _amount;
-    staker[msg.sender].startBlock = block.number;
+    staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].stakeRewards = 0;
 
     require(stakeToken.transfer(msg.sender, _amount), "TransferFrom fail");
@@ -85,21 +85,40 @@ contract ArborsStakingWithFixedLockTime is Ownable, Pausable {
   function withdrawRewards() external whenNotPaused {
     uint256 amountWithdraw = _withdrawRewards();
     require(amountWithdraw > 0, "Insufficient rewards balance");
-    staker[msg.sender].startBlock = block.number;
+    staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].stakeRewards = 0;
 
     emit LogRewardsWithdrawal(msg.sender, amountWithdraw);
   }
 
   function getTotalRewards(address _staker) public view returns (uint256) {
-    uint256 newRewards = ((block.number - staker[_staker].startBlock) * staker[_staker].amount * rewardPerBlockTokenN) /
-      rewardPerBlockTokenD;
+    uint256 newRewards = ((block.timestamp - staker[_staker].startTime) * staker[_staker].amount * rate) /
+      (YEAR_SECOND * 100);
     return newRewards + staker[_staker].stakeRewards;
+  }
+
+  function getPendingRewards(address _staker) public view returns (uint256) {
+    return staker[_staker].stakeRewards;
+  }
+
+  function calculateRewards(uint256 _start, uint256 _amount) public view returns (uint256) {
+    uint256 newRewards = ((block.timestamp - _start) * _amount * rate) / (YEAR_SECOND * 100);
+    return newRewards;
+  }
+
+  function calculateDayRewards(uint256 _start, uint256 _amount) public view returns (uint256) {
+    uint256 newRewards = ((_start * 1 days) * _amount * rate) / (YEAR_SECOND * 100);
+    return newRewards;
   }
 
   function setLockTime(uint256 _lockTime) external onlyOwner {
     lockTime = _lockTime;
     emit LogSetLockTime(lockTime);
+  }
+
+  function setRate(uint256 _rate) external onlyOwner {
+    rate = _rate;
+    emit LogSetRate(rate);
   }
 
   function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
