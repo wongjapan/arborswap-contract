@@ -17,3 +17,8 @@ https://testnet.bscscan.com/address/0x7e222f9fF78b5A3Ce7d7Bb8AD5eEB87e04117102#c
 
 Successfully verified contract ArborsStaking on Etherscan.
 https://testnet.bscscan.com/address/0x7aAE6E5dC5596F1563b34bE7d917B476568EFaF4#code
+
+# roburna chain
+
+ArborSwapFactory deployed to: 0x0de73FE9d848A68Aba41c3edcd2C69301a7f4573
+pairCodeHash: 0x2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b
