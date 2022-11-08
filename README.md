@@ -22,3 +22,5 @@ https://testnet.bscscan.com/address/0x7aAE6E5dC5596F1563b34bE7d917B476568EFaF4#c
 
 ArborSwapFactory deployed to: 0x0de73FE9d848A68Aba41c3edcd2C69301a7f4573
 pairCodeHash: 0x2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b
+
+ArborSwapRouter02 deployed to: 0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B
