@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IStakingWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
@@ -20,6 +20,9 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
   IERC20 public immutable stakeToken;
   IERC20 public immutable rewardsToken;
 
+  IStakingWallet public rewardWallet;
+  IStakingWallet public depositWallet;
+
   uint256 public lockTime;
   uint256 public rate;
 
@@ -29,6 +32,10 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
   event LogSetLockTime(uint256 lockTime);
   event LogSetRate(uint256 rate);
   event LogTokenRecovery(address tokenRecovered, uint256 amount);
+  event LogChangeRewardWallet(IStakingWallet _old, IStakingWallet _new);
+  event LogChangeDepositWallet(IStakingWallet _old, IStakingWallet _new);
+
+  event LogFillReward(address filler, uint256 amount);
 
   constructor(
     IERC20 _stakeToken,
@@ -42,6 +49,16 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     rate = _rate;
   }
 
+  function setRewardWallet(IStakingWallet _addr) external onlyOwner {
+    emit LogChangeRewardWallet(rewardWallet, _addr);
+    rewardWallet = _addr;
+  }
+
+  function setDepositWallet(IStakingWallet _addr) external onlyOwner {
+    emit LogChangeDepositWallet(depositWallet, _addr);
+    depositWallet = _addr;
+  }
+
   function stake(uint256 _amount) external whenNotPaused {
     require(_amount > 0, "Staking amount must be greater than zero");
 
@@ -51,7 +68,7 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
     }
 
-    require(stakeToken.transferFrom(msg.sender, address(this), _amount), "TransferFrom fail");
+    require(stakeToken.transferFrom(msg.sender, address(depositWallet), _amount), "TransferFrom fail");
 
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startTime = block.timestamp;
@@ -69,15 +86,24 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].stakeRewards = 0;
 
-    require(stakeToken.transfer(msg.sender, _amount), "TransferFrom fail");
+    depositWallet.withdrawReward(msg.sender, _amount);
 
     emit LogUnstake(msg.sender, _amount, amountWithdraw);
+  }
+
+  function fillRewards(uint256 _amount) external whenNotPaused {
+    require(address(rewardWallet) != address(0), "Reward Wallet not Set");
+    require(_amount > 0, "reward amount must be greater than zero");
+    require(rewardsToken.balanceOf(msg.sender) >= _amount, "Insufficient rewardsToken balance");
+
+    require(rewardsToken.transferFrom(msg.sender, address(rewardWallet), _amount), "TransferFrom fail");
+    emit LogFillReward(msg.sender, _amount);
   }
 
   function _withdrawRewards() internal returns (uint256) {
     uint256 amountWithdraw = getTotalRewards(msg.sender);
     if (amountWithdraw > 0) {
-      require(rewardsToken.transfer(msg.sender, amountWithdraw), "TransferFrom fail");
+      rewardWallet.withdrawReward(msg.sender, amountWithdraw);
     }
     return amountWithdraw;
   }
