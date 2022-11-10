@@ -38,3 +38,16 @@ https://testnet.bscscan.com/address/0x6Ef84972B6d58e78b9a4512D808eb87F18A308a6#c
 
 Successfully verified contract Fight4HopedividendTracker on Etherscan.
 https://testnet.bscscan.com/address/0x6C026Ca666397aF0298523755d6406725E453DA2#code
+
+# new staking contract
+
+Fixed lock 60days
+https://testnet.bscscan.com/address/0x2a1c078a8e66cc6726413A1F21eaa23c278642e2#code
+reward = https://testnet.bscscan.com/address/0xE4a006a895319CcF0D4aB36F78767C308c481479#code
+deposit = https://testnet.bscscan.com/address/0x490094715BdB0eF5a72C8eC3C77793cF7f68A33B#code
+
+normal staking
+https://testnet.bscscan.com/address/0xB9292782a4d96Fe4feC35C4603079fE33862f54d#code
+
+reward = https://testnet.bscscan.com/address/0x3DD6313ea3Af7bdAafAC09BBeB3760122C764951#code
+deposit = https://testnet.bscscan.com/address/0x428d17B458F3a60853E121bc6c6c0F09FDafaCF8#code
