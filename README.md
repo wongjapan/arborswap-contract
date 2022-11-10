@@ -24,3 +24,17 @@ ArborSwapFactory deployed to: 0x0de73FE9d848A68Aba41c3edcd2C69301a7f4573
 pairCodeHash: 0x2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b
 
 ArborSwapRouter02 deployed to: 0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B
+
+# new bsc contract
+
+Successfully verified contract RoburnaDividendTracker on Etherscan.
+https://testnet.bscscan.com/address/0x2d20a56C1d5a259e5dB6CcB31e1B3cA2Cbf93c80#code
+
+Successfully verified contract Roburna on Etherscan.
+https://testnet.bscscan.com/address/0xb89f9A34eF21ea8cc0475EdA7542A61E9C7108A9#code
+
+Successfully verified contract Fight4Hope on Etherscan.
+https://testnet.bscscan.com/address/0x6Ef84972B6d58e78b9a4512D808eb87F18A308a6#code
+
+Successfully verified contract Fight4HopedividendTracker on Etherscan.
+https://testnet.bscscan.com/address/0x6C026Ca666397aF0298523755d6406725E453DA2#code
