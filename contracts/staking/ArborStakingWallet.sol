@@ -13,6 +13,7 @@ contract ArborStakingWallet is Ownable {
 
   constructor(IStakingToken _mainToken, address _stakingContract) {
     mainToken = _mainToken;
+    deployer = msg.sender;
     transferOwnership(_stakingContract);
   }
 

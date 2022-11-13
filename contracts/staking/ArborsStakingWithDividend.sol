@@ -61,6 +61,7 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     require(address(depositWallet) != address(0), "Deposit Wallet not Set");
 
     require(_amount > 0, "Staking amount must be greater than zero");
+    require(stakeToken.allowance(msg.sender, address(this)) >= _amount, "Insufficient allowance.");
 
     require(stakeToken.balanceOf(msg.sender) >= _amount, "Insufficient stakeToken balance");
 
@@ -68,7 +69,7 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
     }
 
-    require(stakeToken.transferFrom(msg.sender, address(depositWallet), _amount), "TransferFrom fail");
+    stakeToken.transferFrom(msg.sender, address(depositWallet), _amount);
 
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startTime = block.timestamp;

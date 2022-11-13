@@ -1,8 +1,8 @@
 const hre = require("hardhat");
 const {ethers} = require("hardhat");
 
-const mainToken = "0x6Ef84972B6d58e78b9a4512D808eb87F18A308a6";
-const stakingContract = "0xB9292782a4d96Fe4feC35C4603079fE33862f54d";
+const mainToken = "0xFAe063159b4d83d8491271a165eECa5632E4c288";
+const stakingContract = "0x907be116635eF8F3F360f74A46c10F81434B6908";
 // const rate = "5";
 
 async function main() {
@@ -13,15 +13,15 @@ async function main() {
 
   console.log("ArborStakingWallet deployed to:", arborsStakingWallet.address);
 
-  try {
-    await hre.run("verify", {
-      address: arborsStakingWallet.address,
-      constructorArgsParams: [mainToken, stakingContract],
-    });
-  } catch (error) {
-    console.error(error);
-    console.log(`Smart contract at address ${arborsStakingWallet.address} is already verified`);
-  }
+  // try {
+  //   await hre.run("verify", {
+  //     address: arborsStakingWallet.address,
+  //     constructorArgsParams: [mainToken, stakingContract],
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   console.log(`Smart contract at address ${arborsStakingWallet.address} is already verified`);
+  // }
 }
 
 main().catch((error) => {

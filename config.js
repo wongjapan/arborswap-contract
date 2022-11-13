@@ -2,7 +2,7 @@ module.exports = {
   forkNetwork: {
     rba: "https://preseed-testnet-1.roburna.com/",
     bsc: "https://bscrpc.com/",
-    bsc_testnet: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    bsc_testnet: "https://bsc-testnet.nodereal.io/v1/38470031e9f94a6e8804a7523bb422f5",
   },
   wbnb: {
     rba: "0x238F5666A0f12c571B7B3fBd5b5a434146dFa0C5",
@@ -15,7 +15,7 @@ module.exports = {
     bsc_testnet: "0x0de73FE9d848A68Aba41c3edcd2C69301a7f4573",
   },
   router: {
-    rba: "0x8f7c7181ed1a2ba41cfdbb1fcba130a6ee788cf1",
+    rba: "0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B",
     bsc: "0x4e1845Ab1d9D464150777a931Ce8FDaaD1cf8229",
     bsc_testnet: "0x4e1845Ab1d9D464150777a931Ce8FDaaD1cf8229",
   },
