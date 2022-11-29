@@ -365,8 +365,8 @@ contract FACTORY is Context, IBEP20, Ownable {
   string public _name;
 
   constructor() public {
-    _name = "Memecoin Factory";
-    _symbol = "FACTORY";
+    _name = "Memecoin Factory 2";
+    _symbol = "FACTORY2";
     _decimals = 18;
     _totalSupply = 5000000000000000000000000000;
     _balances[msg.sender] = _totalSupply;
