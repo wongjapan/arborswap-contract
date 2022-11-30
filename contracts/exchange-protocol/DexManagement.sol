@@ -38,9 +38,9 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
     event LogSwapExactTokensForTokens(address indexed, address indexed, uint256, uint256);
     event LogSwapExactETHForTokens(address indexed, uint256, uint256);
     event LogSwapExactTokenForETH(address indexed, uint256, uint256);
-    event LogSwapExactTokensForTokensOn0x(address indexed, address indexed, uint256, uint256);
-    event LogSwapExactETHForTokensOn0x(address indexed, uint256, uint256);
-    event LogSwapExactTokenForETHOn0x(address indexed, uint256, uint256);
+    event LogSwapExactTokensForTokensEx(address indexed, address indexed, uint256, uint256);
+    event LogSwapExactETHForTokensEx(address indexed, uint256, uint256);
+    event LogSwapExactTokenForETHEx(address indexed, uint256, uint256);
 
     //-------------------------------------------------------------------------
     // CONSTRUCTOR
@@ -77,7 +77,7 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
      * @param   _tokenB: tokenB contract address
      * @return  bool: if pair is in External, return true, else, return false.
      */
-    function isExternalPairExists(address _tokenA, address _tokenB) public view returns(bool){        
+    function isPairExistsEx(address _tokenA, address _tokenB) public view returns(bool){        
         return IArborSwapFactory(externalRouter.factory()).getPair(_tokenA, _tokenB) != address(0);
     }
 
@@ -97,7 +97,7 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
      * @param   _tokenB: tokenB contract address
      * @return  bool: if path is in External, return true, else, return false.
      */
-    function isExternalPathExists(address _tokenA, address _tokenB) public view returns(bool){        
+    function isPathExistsEx(address _tokenA, address _tokenB) public view returns(bool){        
         return IArborSwapFactory(defaultRouter.factory()).getPair(_tokenA, _tokenB) != address(0) || 
             (IArborSwapFactory(defaultRouter.factory()).getPair(_tokenA, defaultRouter.WETH()) != address(0) && 
             IArborSwapFactory(defaultRouter.factory()).getPair(defaultRouter.WETH(), _tokenB) != address(0));
@@ -288,6 +288,139 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
         require(IERC20(token).transfer(TREASURY, _amountIn - _swapAmountIn), "Faild Transfer");
 
         emit LogSwapExactTokenForETH(token, _amountIn, boughtAmount);
+    }
+
+    /**
+     * @param   tokenA: InputToken Address to swap on External
+     * @param   tokenB: OutputToken Address to swap on External
+     * @param   _amountIn: Amount of InputToken to swap on External
+     * @param   _amountOutMin: The minimum amount of output tokens that must be received for the transaction not to revert.
+     * @param   to: Recipient of the output tokens.
+     * @param   deadline: Deadline, Timestamp after which the transaction will revert.
+     * @notice  Swap ERC20 token to ERC20 token on External
+     */
+    function swapExactTokensForTokensEx(
+        address tokenA, 
+        address tokenB, 
+        uint256 _amountIn, 
+        uint256 _amountOutMin, 
+        address to, 
+        uint deadline
+    ) external whenNotPaused nonReentrant {
+        require(isPathExistsEx(tokenA, tokenB), "Invalid path");
+        require(_amountIn > 0 , "Invalid amount");
+
+        require(IERC20(tokenA).transferFrom(_msgSender(), address(this), _amountIn), "Faild TransferFrom");
+
+        uint256 _swapAmountIn = _amountIn * (10000 - SWAP_FEE) / 10000;
+        
+        require(IERC20(tokenA).approve(address(externalRouter), _swapAmountIn));
+
+        address[] memory path;
+        if (isPairExistsEx(tokenA, tokenB)) 
+        {
+            path = new address[](2);
+            path[0] = tokenA;
+            path[1] = tokenB;
+        }         
+        else {
+            path = new address[](3);
+            path[0] = tokenA;
+            path[1] = externalRouter.WETH();
+            path[2] = tokenB;
+        }
+        
+        uint256 boughtAmount = IERC20(tokenB).balanceOf(to);
+        externalRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+            _swapAmountIn,
+            _amountOutMin,  
+            path,
+            to,
+            deadline
+        );
+        boughtAmount = IERC20(tokenB).balanceOf(to) - boughtAmount;
+
+        require(IERC20(tokenA).transfer(TREASURY, _amountIn - _swapAmountIn), "Faild Transfer");
+
+        emit LogSwapExactTokensForTokensEx(tokenA, tokenB, _amountIn, boughtAmount);
+    }
+
+    /**
+     * @param   token: OutputToken Address to swap on External
+     * @param   _amountOutMin: The minimum amount of output tokens that must be received for the transaction not to revert.
+     * @param   to: Recipient of the output tokens.
+     * @param   deadline: Deadline, Timestamp after which the transaction will revert.
+     * @notice  Swap ETH to ERC20 token on External
+     */
+    function swapExactETHForTokensEx(
+        address token, 
+        uint256 _amountOutMin, 
+        address to, 
+        uint deadline
+    ) external payable whenNotPaused nonReentrant {
+        require(isPathExistsEx(token, externalRouter.WETH()), "Invalid path");
+        require(msg.value > 0 , "Invalid amount");
+
+        address[] memory path = new address[](2);
+        path[0] = externalRouter.WETH();
+        path[1] = token;
+
+        uint256 _swapAmountIn = msg.value * (10000 - SWAP_FEE) / 10000;
+
+        uint256 boughtAmount = IERC20(token).balanceOf(to);
+        externalRouter.swapExactETHForTokensSupportingFeeOnTransferTokens{value: _swapAmountIn}(                
+            _amountOutMin,
+            path,
+            to,
+            deadline
+        );
+        boughtAmount = IERC20(token).balanceOf(to) - boughtAmount;
+
+        payable(TREASURY).transfer(msg.value - _swapAmountIn);
+
+        emit LogSwapExactETHForTokensEx(token, msg.value, boughtAmount);
+    }
+
+    /**
+     * @param   token: InputToken Address to swap on Arborswap
+     * @param   _amountIn: Amount of InputToken to swap on Arborswap
+     * @param   _amountOutMin: The minimum amount of output tokens that must be received for the transaction not to revert.
+     * @param   to: Recipient of the output tokens.
+     * @param   deadline: Deadline, Timestamp after which the transaction will revert.
+     * @notice  Swap ERC20 token to ETH on Arborswap
+     */
+    function swapExactTokenForETHEx(
+        address token, 
+        uint256 _amountIn, 
+        uint256 _amountOutMin, 
+        address to, 
+        uint deadline
+    ) external whenNotPaused nonReentrant {
+        require(isPathExistsEx(token, externalRouter.WETH()), "Invalid path");
+        require(_amountIn > 0 , "Invalid amount");
+
+        address[] memory path = new address[](2);
+        path[0] = token;
+        path[1] = externalRouter.WETH();
+        
+        require(IERC20(token).transferFrom(_msgSender(), address(this), _amountIn), "Faild TransferFrom");
+        uint256 _swapAmountIn = _amountIn * (10000 -  SWAP_FEE) / 10000;
+        
+        require(IERC20(token).approve(address(externalRouter), _swapAmountIn));
+
+        uint256 boughtAmount = address(to).balance;
+        externalRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(   
+            _swapAmountIn,         
+            _amountOutMin,         
+            path,
+            to,
+            deadline
+        );
+        boughtAmount = address(to).balance - boughtAmount;
+
+        require(IERC20(token).transfer(TREASURY, _amountIn - _swapAmountIn), "Faild Transfer");
+
+        emit LogSwapExactTokenForETHEx(token, _amountIn, boughtAmount);
     }
     
     function withdraw(address token) external onlyOwner nonReentrant {

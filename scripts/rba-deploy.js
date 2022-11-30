@@ -1,6 +1,7 @@
 const hre = require("hardhat");
 const {ethers} = require("hardhat");
 const {FEE_TO_SETTER} = require("./constants/address");
+const {wbnb} = require("../config");
 
 async function main() {
   const ArborSwapFactory = await ethers.getContractFactory("ArborSwapFactory");
@@ -22,6 +23,13 @@ async function main() {
   //     console.error(error);
   //     console.log(`Smart contract at address ${arborSwapFactory.address} is already verified`);
   //   }
+
+  const ArborSwapRouter02 = await ethers.getContractFactory("ArborSwapRouter02");
+  const arborSwapRouter02 = await ArborSwapRouter02.deploy(arborSwapFactory.address, wbnb.rba);
+
+  await arborSwapRouter02.deployed();
+
+  console.log("ArborSwapRouter02 deployed to:", arborSwapRouter02.address);
 }
 
 main().catch((error) => {
