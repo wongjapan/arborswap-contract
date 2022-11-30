@@ -31,6 +31,7 @@ F4h Token deployed to: 0xFAe063159b4d83d8491271a165eECa5632E4c288
 f4h dividendTracker deployed to: 0xcdD7622F623f81966a90e6b310154893952a14cf
 new dividendTracker deployed to: 0xC77586c3A9d259Ad8D44Fd620C1743Add899e544
 
+WRBA=0x238F5666A0f12c571B7B3fBd5b5a434146dFa0C5
 USDT Token deployed to: 0x7698075E1Da02e6F068FF078f40A0a14260f0D6a
 USDC Token deployed to: 0x430EA547076C0051B252b1ab1ef83cd83F2D1aB4
 BNB Token deployed to: 0xbD165449C0e33c5E3a6d5c50C3381E9DA1e4E72a
@@ -74,3 +75,17 @@ https://testnet.bscscan.com/address/0x710d02D9dE326e14F63c1E1a201Cd3A50570E3EC#c
 
 deposit : https://testnet.bscscan.com/address/0xB503BA98dF8B35121df3034Bb319A6f71c502D98#code
 reward : https://testnet.bscscan.com/address/0xCDb10c25A5ca91D50AC7e12e01708a6AeFC19ca1#code
+
+# rba router
+
+ArborSwapFactory deployed to: 0x0de73FE9d848A68Aba41c3edcd2C69301a7f4573
+pairCodeHash: 0x2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b
+ArborSwapRouter02 deployed to: 0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B
+
+# fake router
+
+ArborSwapFactory deployed to: 0x546a3792EebDC95dF789316954acd5B3A82ef2BB
+pairCodeHash: 0x2e26c6a371cb994ce7b30f334480a5782dff687140d5608ced830fc138a0ed7b
+ArborSwapRouter02 deployed to: 0xcEd0eF810B549E5a934c8ac1AA08a7dC348c0ea9
+
+DEXManagement deployed to: 0x1E1D8cdb600a45bD56391652aE193a2a5Df19dEd
