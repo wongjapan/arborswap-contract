@@ -136,6 +136,60 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
      * @param   _amountOut: amount of output token
      * @return  uint256: Returns the minimum input asset amount required to buy the given output asset amount.
      */
+    function getAmountInEx(address tokenIn, address tokenOut, uint256 _amountOut) external view returns(uint256) { 
+        require(_amountOut > 0 , "Invalid amount");
+        require(isPathExistsEx(tokenIn, tokenOut), "Invalid path");
+
+        address[] memory path;
+        if (isPairExistsEx(tokenIn, tokenOut))
+        {
+            path = new address[](2);
+            path[0] = tokenIn;
+            path[1] = tokenOut;
+        } 
+        else {
+            path = new address[](3);
+            path[0] = tokenIn;
+            path[1] = defaultRouter.WETH();
+            path[2] = tokenOut;
+        }
+        uint256[] memory amountInMins = externalRouter.getAmountsIn(_amountOut, path);
+        return amountInMins[0] * 10000 / (10000 - SWAP_FEE);
+    }
+
+    /**
+     * @param   tokenIn: tokenIn contract address
+     * @param   tokenOut: tokenOut contract address
+     * @param   _amountIn: amount of input token
+     * @return  uint256: Given an input asset amount, returns the maximum output amount of the other asset.
+     */
+    function getAmountOutEx(address tokenIn, address tokenOut, uint256 _amountIn) external view returns(uint256) { 
+        require(_amountIn > 0 , "Invalid amount");
+        require(isPathExistsEx(tokenIn, tokenOut), "Invalid path");
+
+        address[] memory path;
+        if (isPairExistsEx(tokenIn, tokenOut))
+        {
+            path = new address[](2);
+            path[0] = tokenIn;
+            path[1] = tokenOut;
+        }
+        else {
+            path = new address[](3);
+            path[0] = tokenIn;
+            path[1] = defaultRouter.WETH();
+            path[2] = tokenOut;
+        }
+        uint256[] memory amountOutMaxs = externalRouter.getAmountsOut(_amountIn * (10000 - SWAP_FEE) / 10000, path);
+        return amountOutMaxs[path.length - 1];  
+    }
+
+    /**
+     * @param   tokenIn: tokenIn contract address
+     * @param   tokenOut: tokenOut contract address
+     * @param   _amountOut: amount of output token
+     * @return  uint256: Returns the minimum input asset amount required to buy the given output asset amount.
+     */
     function getAmountIn(address tokenIn, address tokenOut, uint256 _amountOut) external view returns(uint256) { 
         require(_amountOut > 0 , "Invalid amount");
         require(isPathExists(tokenIn, tokenOut), "Invalid path");
