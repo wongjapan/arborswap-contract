@@ -1,0 +1,10 @@
+
+Token Name      : Candida Token
+Token Symbol    : CEI
+Token Address   : 0x5B4adb0666C4105092aD139D4A673647976B33bD
+=============================================
+
+Token Name      : Marcelo Token
+Token Symbol    : XZM
+Token Address   : 0xA7B7C675655DFb815e43BA25cf0D0c5c80C7ca06
+=============================================

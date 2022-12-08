@@ -89,14 +89,17 @@ module.exports = {
     rba: {
       url: forkNetwork.rba || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      allowUnlimitedContractSize: true,
     },
     eth: {
       url: process.env.ETH_URL || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      allowUnlimitedContractSize: true,
     },
     bscTestnet: {
       url: forkNetwork.bsc_testnet || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      allowUnlimitedContractSize: true,
     },
     bsc: {
       url: process.env.BSC_URL || "",
@@ -105,6 +108,7 @@ module.exports = {
     mumbai: {
       url: forkNetwork.mumbai || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      allowUnlimitedContractSize: true,
     },
   },
   gasReporter: {
