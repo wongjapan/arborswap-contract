@@ -224,7 +224,7 @@ contract DEXManagement is Ownable, Pausable, ReentrancyGuard {
         require(IERC20(token).transferFrom(_msgSender(), address(this), _amountIn), "Failed TransferFrom");
         uint256 _swapAmountIn = _amountIn * (10000 -  SWAP_FEE) / 10000;
         
-        require(IERC20(token).approve(address(defaultRouter), _swapAmountIn), "Failed Approve");
+        require(IERC20(token).approve(address(selectedRouter), _swapAmountIn), "Failed Approve");
         
         uint256 boughtAmount = address(to).balance;
         selectedRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(   
