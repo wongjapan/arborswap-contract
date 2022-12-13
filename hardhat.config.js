@@ -79,7 +79,7 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "rba",
+  defaultNetwork: "bsc",
   networks: {
     hardhat: {
       forking: {
