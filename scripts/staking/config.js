@@ -1,14 +1,15 @@
 const hre = require("hardhat");
 const {ethers} = require("hardhat");
 
-const normalStakeAddress = "0x1bC090Ed5dFF341ed3fd31332E99993584C7693e";
-const lockStakeAddress = "0x73af2A6aC50E1f1FF8F9f596a34F4b10047bb0DB";
+const normalStakeAddress = "0xDd9a1ACE63E912239F325122d677D18D930333f6";
+const lockStakeAddress = "0xA1D6DE0a9771066bDa7e29c8B7c2c302Bc557313";
 
-const lockRewardAddress = "0x59C5F098967351D27B07eDDD0c93DA8Ffec9386e";
-const lockTreasuryAddress = "0x271bc8cc0c12808DD3B95a192Db30777Ea4dd689";
+const lockRewardAddress = "0xe14409c3673f5F4797b2F93005B90f57f7b5225C";
+const lockTreasuryAddress = "0xeFf860191F55a1cd6b8617DC2B7bb7b1342a18d7";
 
-const normalRewardAddress = "0x3E222ed9fAd9E7D53354327Ab3912bBb8177d02a";
-const normalTreasuryAddress = "0xb84DaE475Fc7c676d2Fd48d2673543A706c13C77";
+const normalRewardAddress = "0xFe3902073E03D88f97A1C34277Eec02bf7cE6E12";
+const normalTreasuryAddress = "0x4104E9DA68208FC084371957555A59dAEf518426";
+
 async function main() {
   let tx;
   const ArborsStaking = await ethers.getContractFactory("ArborsStakingWithDividend");
