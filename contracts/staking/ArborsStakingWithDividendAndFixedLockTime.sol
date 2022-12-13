@@ -13,6 +13,16 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     uint256 stakeRewards;
   }
 
+  struct Info {
+    uint256 totalStaked;
+    uint256 totalRewardDepositted;
+    uint256 totalRewardWithdrawn;
+    uint256 activeStaker;
+    uint256 totalStaker;
+  }
+
+  Info public platformInfo;
+
   // Staker Info
   mapping(address => StakerInfo) public staker;
   uint256 public constant YEAR_SECOND = 31577600;
@@ -23,14 +33,12 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
   IStakingWallet public rewardWallet;
   IStakingWallet public depositWallet;
 
-  uint256 public lockTime;
-  uint256 public rate;
+  uint256 public immutable lockTime;
+  uint256 public immutable rate;
 
   event LogStake(address indexed from, uint256 amount);
   event LogUnstake(address indexed from, uint256 amount, uint256 amountRewards);
   event LogRewardsWithdrawal(address indexed to, uint256 amount);
-  event LogSetLockTime(uint256 lockTime);
-  event LogSetRate(uint256 rate);
   event LogTokenRecovery(address tokenRecovered, uint256 amount);
   event LogChangeRewardWallet(IStakingWallet _old, IStakingWallet _new);
   event LogChangeDepositWallet(IStakingWallet _old, IStakingWallet _new);
@@ -68,6 +76,9 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
 
     if (staker[msg.sender].amount > 0) {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
+    } else {
+      platformInfo.totalStaker = platformInfo.totalStaker + 1;
+      platformInfo.activeStaker = platformInfo.activeStaker + 1;
     }
 
     stakeToken.transferFrom(msg.sender, address(depositWallet), _amount);
@@ -75,6 +86,9 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].endTime = block.timestamp + (lockTime * 1 days);
+
+    platformInfo.totalStaked = platformInfo.totalStaked + _amount;
+
     emit LogStake(msg.sender, _amount);
   }
 
@@ -88,6 +102,9 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].stakeRewards = 0;
 
+    platformInfo.totalStaked = platformInfo.totalStaked - _amount;
+    platformInfo.totalRewardWithdrawn = platformInfo.totalRewardWithdrawn + amountWithdraw;
+    platformInfo.activeStaker = platformInfo.activeStaker - 1;
     depositWallet.withdrawReward(msg.sender, _amount);
 
     emit LogUnstake(msg.sender, _amount, amountWithdraw);
@@ -97,8 +114,9 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     require(address(rewardWallet) != address(0), "Reward Wallet not Set");
     require(_amount > 0, "reward amount must be greater than zero");
     require(rewardsToken.balanceOf(msg.sender) >= _amount, "Insufficient rewardsToken balance");
-
     require(rewardsToken.transferFrom(msg.sender, address(rewardWallet), _amount), "TransferFrom fail");
+
+    platformInfo.totalRewardDepositted = platformInfo.totalRewardDepositted + _amount;
     emit LogFillReward(msg.sender, _amount);
   }
 
@@ -137,16 +155,6 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
   function calculateDayRewards(uint256 _start, uint256 _amount) public view returns (uint256) {
     uint256 newRewards = ((_start * 1 days) * _amount * rate) / (YEAR_SECOND * 100);
     return newRewards;
-  }
-
-  function setLockTime(uint256 _lockTime) external onlyOwner {
-    lockTime = _lockTime;
-    emit LogSetLockTime(lockTime);
-  }
-
-  function setRate(uint256 _rate) external onlyOwner {
-    rate = _rate;
-    emit LogSetRate(rate);
   }
 
   function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {

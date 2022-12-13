@@ -83,7 +83,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: forkNetwork.rba || "",
+        url: process.env.BSC_URL || "",
       },
     },
     rba: {

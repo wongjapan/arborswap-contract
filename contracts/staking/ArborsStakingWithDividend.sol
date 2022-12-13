@@ -13,12 +13,22 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     uint256 stakeRewards;
   }
 
+  struct Info {
+    uint256 totalStaked;
+    uint256 totalRewardDepositted;
+    uint256 totalRewardWithdrawn;
+    uint256 activeStaker;
+    uint256 totalStaker;
+  }
+
+  Info public platformInfo;
+
   // Staker Info
   mapping(address => StakerInfo) public staker;
 
   uint256 public constant YEAR_SECOND = 31577600;
 
-  uint256 public rate;
+  uint256 public immutable rate;
 
   IERC20 public immutable stakeToken;
   IERC20 public immutable rewardsToken;
@@ -29,9 +39,7 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
   event LogStake(address indexed from, uint256 amount);
   event LogUnstake(address indexed from, uint256 amount, uint256 amountRewards);
   event LogRewardsWithdrawal(address indexed to, uint256 amount);
-  event LogSetRate(uint256 rate);
   event LogTokenRecovery(address tokenRecovered, uint256 amount);
-
   event LogChangeRewardWallet(IStakingWallet _old, IStakingWallet _new);
   event LogChangeDepositWallet(IStakingWallet _old, IStakingWallet _new);
   event LogFillReward(address filler, uint256 amount);
@@ -67,12 +75,18 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
 
     if (staker[msg.sender].amount > 0) {
       staker[msg.sender].stakeRewards = getTotalRewards(msg.sender);
+    } else {
+      platformInfo.totalStaker = platformInfo.totalStaker + 1;
+      platformInfo.activeStaker = platformInfo.activeStaker + 1;
     }
 
     stakeToken.transferFrom(msg.sender, address(depositWallet), _amount);
 
     staker[msg.sender].amount += _amount;
     staker[msg.sender].startTime = block.timestamp;
+
+    platformInfo.totalStaked = platformInfo.totalStaked + _amount;
+
     emit LogStake(msg.sender, _amount);
   }
 
@@ -85,6 +99,10 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     staker[msg.sender].startTime = block.timestamp;
     staker[msg.sender].stakeRewards = 0;
 
+    platformInfo.totalStaked = platformInfo.totalStaked - _amount;
+    platformInfo.totalRewardWithdrawn = platformInfo.totalRewardWithdrawn + amountWithdraw;
+    platformInfo.activeStaker = platformInfo.activeStaker - 1;
+
     depositWallet.withdrawReward(msg.sender, _amount);
 
     emit LogUnstake(msg.sender, _amount, amountWithdraw);
@@ -94,8 +112,9 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     require(address(rewardWallet) != address(0), "Reward Wallet not Set");
     require(_amount > 0, "reward amount must be greater than zero");
     require(rewardsToken.balanceOf(msg.sender) >= _amount, "Insufficient rewardsToken balance");
-
     require(rewardsToken.transferFrom(msg.sender, address(rewardWallet), _amount), "TransferFrom fail");
+
+    platformInfo.totalRewardDepositted = platformInfo.totalRewardDepositted + _amount;
     emit LogFillReward(msg.sender, _amount);
   }
 
@@ -134,11 +153,6 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
 
   function getPendingRewards(address _staker) public view returns (uint256) {
     return staker[_staker].stakeRewards;
-  }
-
-  function setRate(uint256 _rate) external onlyOwner {
-    rate = _rate;
-    emit LogSetRate(rate);
   }
 
   function setPause() external onlyOwner {

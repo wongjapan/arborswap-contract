@@ -23,10 +23,8 @@ contract ArborStakingWallet is Ownable {
   }
 
   function withdrawReward(address receiver, uint256 _amount) external onlyOwnerOrDeployer {
-    require(mainToken.balanceOf(address(this)) >= _amount, "Insufficient reward balance");
-
+    require(mainToken.balanceOf(address(this)) >= _amount, "Insufficient Balance");
     address _dividendToken = IStakingToken(mainToken).dividendToken();
-
     uint256 amountDividenToWithdraw = _getDividenShare(_amount);
 
     /**
@@ -54,12 +52,9 @@ contract ArborStakingWallet is Ownable {
 
   function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwnerOrDeployer {
     address _dividendToken = IStakingToken(mainToken).dividendToken();
-
     require(_tokenAddress != address(mainToken), "Cannot be main token");
     require(_tokenAddress != address(_dividendToken), "Cannot be main dividenToken");
-
     IERC20(_tokenAddress).transfer(address(msg.sender), _tokenAmount);
-
     emit LogTokenRecovery(_tokenAddress, _tokenAmount);
   }
 }

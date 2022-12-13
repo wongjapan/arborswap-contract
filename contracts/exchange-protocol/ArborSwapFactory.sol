@@ -15,8 +15,9 @@ contract ArborSwapFactory is IArborSwapFactory {
 
   event PairCreated(address indexed token0, address indexed token1, address pair, uint256);
 
-  constructor(address _feeToSetter) public {
+  constructor(address _feeToSetter, address _feeTo) public {
     feeToSetter = _feeToSetter;
+    feeTo = _feeTo;
   }
 
   function allPairsLength() external view override returns (uint256) {

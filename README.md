@@ -89,4 +89,18 @@ pairCodeHash: 0xc1356d02a24c59f29ae5ee0746a3c82345d8817f2dc7e93b56110d5690e5f242
 GooseBumpsSwapRouter02 deployed to: 0x31cBD96B9a32da36181462840D33880afAE87474
 
 DEXManagement deployed to: 0x0D0021E152b7301AF6eD53045FD124D12625eDb3
-NEW DEXManagement deployed to: 0xE4a006a895319CcF0D4aB36F78767C308c481479
+DEXManagement deployed to: 0x490094715BdB0eF5a72C8eC3C77793cF7f68A33B
+
+# MAINNET
+
+Successfully verified contract ArborSwapFactory on Etherscan.
+https://bscscan.com/address/0x0438309c81376d90D191Ab2Cdd464716B3c69B54#code
+
+Successfully verified contract ArborSwapRouter02 on Etherscan.
+https://bscscan.com/address/0x3027Ae348394349886f963D35786e5F468A221DE#code
+
+Successfully verified contract ArborSwapPair on Etherscan.
+https://bscscan.com/address/0x56f7C543CCA4C1797B093a5fa8eE24dd4F078eFE#code
+
+Successfully verified contract DEXManagement on Etherscan.
+https://bscscan.com/address/0x1A55251C7aeD192f038e20572f1d6596FEa87154#code
