@@ -31,7 +31,16 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 300,
+          },
+        },
+      },
+      {
+        version: "0.8.4",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 300,
           },
         },
       },
@@ -79,7 +88,7 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "bsc",
+  defaultNetwork: "bscTestnet",
   networks: {
     hardhat: {
       forking: {
