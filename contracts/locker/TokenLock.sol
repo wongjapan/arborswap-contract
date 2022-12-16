@@ -14,6 +14,7 @@ contract TokenLock {
     uint256 unlockDate;
     string logoImage;
     bool isWithdrawn;
+    bool isVesting;
   }
 
   LockInfo public lockInfo;
@@ -53,6 +54,7 @@ contract TokenLock {
     lockInfo.amount = _amount;
     lockInfo.token = IERC20(_token);
     lockInfo.logoImage = _logoImage;
+    lockInfo.isVesting = false;
     lockFactory = _factory;
   }
 

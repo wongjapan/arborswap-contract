@@ -14,6 +14,7 @@ contract VestingLock {
     uint256 unlockDate;
     string logoImage;
     bool isWithdrawn;
+    bool isVesting;
   }
 
   struct VestingInfo {
@@ -36,8 +37,6 @@ contract VestingLock {
     require(msg.sender == owner || msg.sender == lockFactory, "ONLY_OWNER_OR_FACTORY");
     _;
   }
-
-  event LogExtendLockTime(uint256 oldUnlockTime, uint256 newUnlockTime);
   event LogWithdraw(address to, uint256 lockedAmount);
   event LogWithdrawReflections(address to, uint256 amount);
   event LogWithdrawDividends(address to, uint256 dividends);
@@ -64,6 +63,7 @@ contract VestingLock {
     lockInfo.amount = _amount;
     lockInfo.token = IERC20(_token);
     lockInfo.logoImage = _logoImage;
+    lockInfo.isVesting = true;
     lockFactory = _factory;
 
     _initializeVested(_amount, _unlockDate, _tgePercent, _cycle, _cyclePercent);
@@ -103,17 +103,6 @@ contract VestingLock {
     }
   }
 
-  function extendLockTime(uint256 newUnlockDate) external onlyOwner {
-    require(lockInfo.isWithdrawn == false, "ALREADY_UNLOCKED");
-    uint256 oldDate = lockInfo.unlockDate;
-
-    // solhint-disable-next-line not-rely-on-time,
-    require(newUnlockDate >= lockInfo.unlockDate && newUnlockDate > block.timestamp, "BAD_TIME_INPUT");
-    lockInfo.unlockDate = newUnlockDate;
-
-    emit LogExtendLockTime(oldDate, newUnlockDate);
-  }
-
   function updateLogo(string memory newLogoImage) external onlyOwner {
     require(lockInfo.isWithdrawn == false, "ALREADY_UNLOCKED");
     lockInfo.logoImage = newLogoImage;
@@ -124,11 +113,31 @@ contract VestingLock {
     require(block.timestamp >= lockInfo.unlockDate, "WRONG_TIME");
     require(lockInfo.isWithdrawn == false, "ALREADY_UNLOCKED");
 
-    lockInfo.isWithdrawn = true;
+    uint256 unlocked = 0;
+    for (uint256 i = 0; i < vestingInfo.length; i++) {
+      // solhint-disable-next-line not-rely-on-time,
+      if (!vestingInfo[i].isWithdrawn && vestingInfo[i].unlockDate < block.timestamp) {
+        unlocked = unlocked + vestingInfo[i].amount;
+        vestingInfo[i].isWithdrawn = true;
+      }
+    }
+    if (unlocked == lockInfo.amount) {
+      lockInfo.isWithdrawn = true;
+    }
 
-    lockInfo.token.transfer(owner, lockInfo.amount);
+    lockInfo.token.transfer(owner, unlocked);
 
-    emit LogWithdraw(owner, lockInfo.amount);
+    emit LogWithdraw(owner, unlocked);
+  }
+
+  function getLockedValue() public view returns (uint256) {
+    uint256 locked = 0;
+    for (uint256 i = 0; i < vestingInfo.length; i++) {
+      if (!vestingInfo[i].isWithdrawn) {
+        locked = locked + vestingInfo[i].amount;
+      }
+    }
+    return locked;
   }
 
   function withdrawReflections() external onlyOwner {
@@ -140,7 +149,8 @@ contract VestingLock {
       emit LogWithdrawReflections(owner, reflections);
     } else {
       uint256 contractBalanceWReflections = lockInfo.token.balanceOf(address(this));
-      uint256 reflections = contractBalanceWReflections - lockInfo.amount;
+      uint256 lockedValue = getLockedValue();
+      uint256 reflections = contractBalanceWReflections - lockedValue;
       if (reflections > 0) {
         lockInfo.token.transfer(owner, reflections);
       }

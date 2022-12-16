@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./TokenLock.sol";
+import "./VestingLock.sol";
 import "./LiquidityLock.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -61,6 +62,44 @@ contract LockFactory is Ownable {
     require(IERC20(_token).allowance(msg.sender, address(this)) >= _amount, "BAD_ALLOWANCE");
 
     TokenLock lock = new TokenLock(_owner, _unlockDate, _amount, _token, address(this), _logoImage);
+    address createdLock = address(lock);
+
+    uint256 id = tokenLock.length;
+    tokenLockIdToAddress[id] = createdLock;
+    tokenLockOwner[_owner].push(createdLock);
+    tokenLock.push(createdLock);
+    _safeTransferExactAmount(_token, msg.sender, createdLock, _amount);
+    fee.feeReceiver.transfer(msg.value);
+    emit LogCreateTokenLock(createdLock, _owner);
+  }
+
+  function createVestingLock(
+    address _owner,
+    address _token,
+    uint256 _amount,
+    uint256 _unlockDate,
+    uint256 _tgePercent,
+    uint256 _cycle,
+    uint256 _cyclePercent,
+    string memory _logoImage
+  ) external payable {
+    require(_owner != address(0), "ADDRESS_ZERO");
+    require(msg.value >= fee.vestingFee, "BAD_FEE");
+    require(IERC20(_token).balanceOf(msg.sender) >= _amount, "NOT_ENOUGH_TOKEN");
+    require(IERC20(_token).allowance(msg.sender, address(this)) >= _amount, "BAD_ALLOWANCE");
+    require(_isValidVested(_tgePercent, _cyclePercent), "NOT_VALID_VESTED");
+
+    VestingLock lock = new VestingLock(
+      _owner,
+      _unlockDate,
+      _amount,
+      _token,
+      address(this),
+      _tgePercent,
+      _cycle,
+      _cyclePercent,
+      _logoImage
+    );
     address createdLock = address(lock);
 
     uint256 id = tokenLock.length;
@@ -214,5 +253,9 @@ contract LockFactory is Ownable {
     IUniswapV2Pair pair = IUniswapV2Pair(token);
     address factoryPair = IUniswapV2Factory(factory).getPair(pair.token0(), pair.token1());
     return factoryPair == token;
+  }
+
+  function _isValidVested(uint256 tgePercent, uint256 cyclePercent) internal pure returns (bool) {
+    return tgePercent + cyclePercent <= 100;
   }
 }
