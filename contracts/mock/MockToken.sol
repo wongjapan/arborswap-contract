@@ -8,9 +8,10 @@ contract MockToken is ERC20 {
   constructor(
     string memory _name,
     string memory _symbol,
-    address receiver
+    address receiver,
+    uint256 _supply
   ) ERC20(_name, _symbol) {
-    _mint(receiver, 10**27);
+    _mint(receiver, _supply);
   }
 
   //   function decimals() public view virtual override returns (uint8) {

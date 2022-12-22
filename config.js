@@ -2,7 +2,7 @@ module.exports = {
   forkNetwork: {
     rba: "https://preseed-testnet-1.roburna.com/",
     bsc: "https://bscrpc.com/",
-    bsc_testnet: "https://bsc-testnet.nodereal.io/v1/38470031e9f94a6e8804a7523bb422f5",
+    bsc_testnet: "https://bsc-testnet.nodereal.io/v1/ff22384aa52147c4adac05ffecc6f9a7",
   },
   wbnb: {
     rba: "0x238F5666A0f12c571B7B3fBd5b5a434146dFa0C5",

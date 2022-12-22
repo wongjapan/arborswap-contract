@@ -8,6 +8,17 @@ const routerAddress = "0x59384a06c86531aF46662845cdD4086F538E7eeA";
 const wbnb = "0x238F5666A0f12c571B7B3fBd5b5a434146dFa0C5";
 const INITIAL_LIQUIDITY = parseUnits("100", 18);
 const INITIAL_BNB_LIQUIDITY = parseUnits("1", 18);
+const TOTAL_SUPPLY = parseUnits("5000000000", 18);
+
+// Will you please ask your Dev team to put a presale on for me.
+
+// 5b supply
+
+// 3 million per Rba
+
+// Hc 350
+
+// Sc 250
 
 async function main() {
   const _name = faker.name.firstName();
@@ -15,11 +26,7 @@ async function main() {
   const symbol = faker.random.alpha({count: 3, casing: "upper"});
 
   const SaleToken = await ethers.getContractFactory("MockToken");
-  const WbnbToken = await ethers.getContractFactory("MockToken");
-  const RouterToken = await ethers.getContractFactory("GooseBumpsSwapRouter02");
-  const routerToken = RouterToken.attach(routerAddress);
-  const bnbToken = WbnbToken.attach(wbnb);
-  const saleContract = await SaleToken.deploy(name, symbol, rec);
+  const saleContract = await SaleToken.deploy(name, symbol, rec, TOTAL_SUPPLY);
 
   await saleContract.deployed();
   const data = `
@@ -31,20 +38,20 @@ Token Address   : ${saleContract.address}
   fs.appendFileSync("mockAddress.txt", data);
   console.log(data);
 
-  await bnbToken.approve(routerAddress, ethers.constants.MaxUint256);
-  await saleContract.approve(routerAddress, ethers.constants.MaxUint256);
+  // await bnbToken.approve(routerAddress, ethers.constants.MaxUint256);
+  // await saleContract.approve(routerAddress, ethers.constants.MaxUint256);
 
-  const liq = await routerToken.addLiquidityETH(
-    saleContract.address,
-    INITIAL_LIQUIDITY,
-    0,
-    0,
-    rec,
-    Math.floor(Date.now() / 1000) + 60 * 10,
-    {value: INITIAL_BNB_LIQUIDITY}
-  );
-  liq.wait();
-  console.log(liq);
+  // const liq = await routerToken.addLiquidityETH(
+  //   saleContract.address,
+  //   INITIAL_LIQUIDITY,
+  //   0,
+  //   0,
+  //   rec,
+  //   Math.floor(Date.now() / 1000) + 60 * 10,
+  //   {value: INITIAL_BNB_LIQUIDITY}
+  // );
+  // liq.wait();
+  // console.log(liq);
 }
 
 main().catch((error) => {

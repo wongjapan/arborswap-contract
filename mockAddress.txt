@@ -1,10 +1,10 @@
 
-Token Name      : Candida Token
-Token Symbol    : CEI
-Token Address   : 0x5B4adb0666C4105092aD139D4A673647976B33bD
+Token Name      : Monica Token
+Token Symbol    : NRW
+Token Address   : 0xCfe970dcB7fb53c3B8E498CE27b06431CF960Dc0
 =============================================
 
-Token Name      : Marcelo Token
-Token Symbol    : XZM
-Token Address   : 0xA7B7C675655DFb815e43BA25cf0D0c5c80C7ca06
+Token Name      : Myrtis Token
+Token Symbol    : IFG
+Token Address   : 0x9EcB46Dba8c5034E16675e7388Ad0A98538d4701
 =============================================

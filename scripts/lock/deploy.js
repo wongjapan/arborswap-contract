@@ -29,15 +29,15 @@ async function main() {
   await factory.deployed();
   console.log("Lock Factory Contract deployed to:", factory.address);
 
-  try {
-    await hre.run("verify", {
-      address: factory.address,
-      constructorArgsParams: [admin.address],
-    });
-  } catch (error) {
-    console.error(error);
-    console.log(`Smart contract at address ${factory.address} is already verified`);
-  }
+  // try {
+  //   await hre.run("verify", {
+  //     address: factory.address,
+  //     constructorArgsParams: [admin.address],
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   console.log(`Smart contract at address ${factory.address} is already verified`);
+  // }
 
   const token_params = [
     "0x9224513121f576441DD9De66d4E598aAD2B433A9",
@@ -73,29 +73,29 @@ async function main() {
   await token.deployed();
   console.log("Token Lock Contract deployed to:", token.address);
 
-  try {
-    await hre.run("verify", {
-      address: token.address,
-      constructorArgsParams: [...token_params],
-    });
-  } catch (error) {
-    console.error(error);
-    console.log(`Smart contract at address ${token.address} is already verified`);
-  }
+  // try {
+  //   await hre.run("verify", {
+  //     address: token.address,
+  //     constructorArgsParams: [...token_params],
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   console.log(`Smart contract at address ${token.address} is already verified`);
+  // }
 
   const liquidity = await LiquidityContract.deploy(...liquidity_params);
   await liquidity.deployed();
   console.log("Liquidity Lock Contract deployed to:", liquidity.address);
 
-  try {
-    await hre.run("verify", {
-      address: liquidity.address,
-      constructorArgsParams: [...liquidity_params],
-    });
-  } catch (error) {
-    console.error(error);
-    console.log(`Smart contract at address ${liquidity.address} is already verified`);
-  }
+  // try {
+  //   await hre.run("verify", {
+  //     address: liquidity.address,
+  //     constructorArgsParams: [...liquidity_params],
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   console.log(`Smart contract at address ${liquidity.address} is already verified`);
+  // }
 
   const vested = await VestedContract.deploy(...vested_params);
   await vested.deployed();
