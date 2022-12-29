@@ -8,3 +8,23 @@ Token Name      : Myrtis Token
 Token Symbol    : IFG
 Token Address   : 0x9EcB46Dba8c5034E16675e7388Ad0A98538d4701
 =============================================
+
+Token Name      : Esmeralda Token
+Token Symbol    : OFK
+Token Address   : 0x08B9B2a7Af71eeE1067D41B71e41794856b51312
+=============================================
+
+Token Name      : Nathaniel Token
+Token Symbol    : YJB
+Token Address   : 0xA78AeFa96c0AA49CE2aD1c9a6cB88aC0eaE49363
+=============================================
+
+Token Name      : Arturo Token
+Token Symbol    : GCD
+Token Address   : 0x0Ce8fF4ff0fa1C37deC51c46FbC06F9C9e2079e2
+=============================================
+
+Token Name      : Delia Token
+Token Symbol    : PDK
+Token Address   : 0x2E3f06cBc737D540F15Fb62c1200b014ddd825c0
+=============================================

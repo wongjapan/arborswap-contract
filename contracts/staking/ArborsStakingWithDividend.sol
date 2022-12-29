@@ -3,10 +3,10 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IStakingWallet.sol";
 
-contract ArborsStakingWithDividend is Ownable, Pausable {
+contract ArborsStakingWithDividend is Ownable, Pausable, ReentrancyGuard {
   struct StakerInfo {
     uint256 amount;
     uint256 startTime;
@@ -90,7 +90,7 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     emit LogStake(msg.sender, _amount);
   }
 
-  function unstake(uint256 _amount) external whenNotPaused {
+  function unstake(uint256 _amount) external whenNotPaused nonReentrant {
     require(_amount > 0, "Unstaking amount must be greater than zero");
     require(staker[msg.sender].amount >= _amount, "Insufficient unstake");
 
@@ -126,7 +126,7 @@ contract ArborsStakingWithDividend is Ownable, Pausable {
     return amountWithdraw;
   }
 
-  function withdrawRewards() external whenNotPaused {
+  function withdrawRewards() external whenNotPaused nonReentrant {
     uint256 amountWithdraw = _withdrawRewards();
     require(amountWithdraw > 0, "Insufficient rewards balance");
     staker[msg.sender].startTime = block.timestamp;

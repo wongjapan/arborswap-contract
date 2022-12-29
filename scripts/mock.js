@@ -26,7 +26,7 @@ async function main() {
   const symbol = faker.random.alpha({count: 3, casing: "upper"});
 
   const SaleToken = await ethers.getContractFactory("MockToken");
-  const saleContract = await SaleToken.deploy(name, symbol, rec, TOTAL_SUPPLY);
+  const saleContract = await SaleToken.deploy(name, symbol, rec, TOTAL_SUPPLY.toString());
 
   await saleContract.deployed();
   const data = `
@@ -37,6 +37,16 @@ Token Address   : ${saleContract.address}
 `;
   fs.appendFileSync("mockAddress.txt", data);
   console.log(data);
+
+  try {
+    await hre.run("verify", {
+      address: saleContract.address,
+      constructorArgsParams: [name, symbol, rec, TOTAL_SUPPLY.toString()],
+    });
+  } catch (error) {
+    console.error(error);
+    console.log(`Smart contract at address ${saleContract.address} is already verified`);
+  }
 
   // await bnbToken.approve(routerAddress, ethers.constants.MaxUint256);
   // await saleContract.approve(routerAddress, ethers.constants.MaxUint256);

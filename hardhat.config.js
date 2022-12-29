@@ -88,14 +88,14 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "bscTestnet",
+  defaultNetwork: "roburna",
   networks: {
     hardhat: {
       forking: {
         url: process.env.BSC_URL || "",
       },
     },
-    rba: {
+    roburna: {
       url: forkNetwork.rba || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       allowUnlimitedContractSize: true,
@@ -135,6 +135,17 @@ module.exports = {
       bsc: process.env.BSCSCAN_API_KEY,
       bscTestnet: process.env.BSCSCAN_API_KEY,
       polygonMumbai: process.env.MUMBAI_API_KEY,
+      // rba: process.env.RBA_API_KEY,
     },
+    customChains: [
+      {
+        network: "roburna",
+        chainId: 159,
+        urls: {
+          apiURL: "https://testapi.rbascan.com/api/",
+          browserURL: "https://rbascan.com/",
+        },
+      },
+    ],
   },
 };

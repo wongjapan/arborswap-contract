@@ -4,8 +4,9 @@ pragma solidity ^0.8.7;
 import "./interfaces/IStakingWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
+contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable, ReentrancyGuard {
   struct StakerInfo {
     uint256 amount;
     uint256 endTime;
@@ -67,7 +68,7 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     depositWallet = _addr;
   }
 
-  function stake(uint256 _amount) external whenNotPaused {
+  function stake(uint256 _amount) external whenNotPaused nonReentrant {
     require(address(rewardWallet) != address(0), "Reward Wallet not Set");
     require(address(depositWallet) != address(0), "Deposit Wallet not Set");
     require(_amount > 0, "Staking amount must be greater than zero");
@@ -92,7 +93,7 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     emit LogStake(msg.sender, _amount);
   }
 
-  function unstake(uint256 _amount) external whenNotPaused {
+  function unstake(uint256 _amount) external whenNotPaused nonReentrant {
     require(block.timestamp > staker[msg.sender].endTime, "Can't unstake yet");
     require(_amount > 0, "Unstaking amount must be greater than zero");
     require(staker[msg.sender].amount >= _amount, "Insufficient unstake");
@@ -128,7 +129,7 @@ contract ArborsStakingWithDividendAndFixedLockTime is Ownable, Pausable {
     return amountWithdraw;
   }
 
-  function withdrawRewards() external whenNotPaused {
+  function withdrawRewards() external whenNotPaused nonReentrant {
     uint256 amountWithdraw = _withdrawRewards();
     require(amountWithdraw > 0, "Insufficient rewards balance");
     staker[msg.sender].startTime = block.timestamp;
