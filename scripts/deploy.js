@@ -16,15 +16,15 @@ async function main() {
   const pairCodeHash = await arborSwapFactory.pairCodeHash();
   console.log("pairCodeHash:", pairCodeHash);
 
-  try {
-    await hre.run("verify", {
-      address: arborSwapFactory.address,
-      constructorArgsParams: [FEE_TO_SETTER, FEE_TO],
-    });
-  } catch (error) {
-    console.error(error);
-    console.log(`Smart contract at address ${arborSwapFactory.address} is already verified`);
-  }
+  // try {
+  //   await hre.run("verify", {
+  //     address: arborSwapFactory.address,
+  //     constructorArgsParams: [FEE_TO_SETTER, FEE_TO],
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   console.log(`Smart contract at address ${arborSwapFactory.address} is already verified`);
+  // }
 }
 
 main().catch((error) => {

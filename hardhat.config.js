@@ -91,8 +91,19 @@ module.exports = {
   defaultNetwork: "roburna",
   networks: {
     hardhat: {
-      forking: {
-        url: process.env.BSC_URL || "",
+      // forking: {
+      //   url: process.env.BSC_FORK_URL || "",
+      //   blockNumber: 23000000,
+      // },
+    },
+    ganache: {
+      url: "HTTP://127.0.0.1:7545",
+      accounts: {
+        mnemonic: process.env.LOCAL_MNEMONIC || "test test test test test test test test test test test junk",
+        path: "m/44'/60'/0'/0",
+        initialIndex: 0,
+        count: 20,
+        passphrase: "",
       },
     },
     roburna: {
